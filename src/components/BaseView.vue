@@ -48,6 +48,7 @@ export default {
       // vrButton: false,
       imageryProvider: googleMap,
       infoBox: false,
+      // terrainProvider : this.Cesium.createWorldTerrain()
       // selectionIndicator:false
     });
     this.viewer.scene.debugShowFramesPerSecond = true;
