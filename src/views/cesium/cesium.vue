@@ -24,7 +24,8 @@ export default {
       pointArr: [],
       pointPositions: [],
       polygonDraw: null,
-      lineDraw: null
+      lineDraw: null,
+      rectDraw: null
     };
   },
   components: {
@@ -304,7 +305,6 @@ export default {
           } else {
             // 如果面已经存在，那么修改面实体的位置数组即可
             this.polygonDraw.polygon.hierarchy = this.pointPositions;
-            
           }
         }
       }, this.Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -394,6 +394,7 @@ export default {
         this.endPolyLine();
       }, this.Cesium.ScreenSpaceEventType.RIGHT_CLICK);
     },
+    //结束绘制线
     endPolyLine() {
       if (this.drawHandler !== null && !this.drawHandler.isDestroyed()) {
         this.drawHandler.destroy();
@@ -408,6 +409,64 @@ export default {
       this.pointArr = [];
       this.pointPositions = [];
       this.lineDraw = null;
+    },
+    //标绘矩形 (需要取最大最小的经纬度)
+    drawRect() {
+      this.drawHandler = new this.Cesium.ScreenSpaceEventHandler(
+        this.viewer.scene.canvas
+      );
+      this.drawHandler.setInputAction(el => {
+        // 获取屏幕坐标（二维坐标）
+        let windowPosition = event.position;
+
+        // 将屏幕坐标转为三维笛卡尔坐标
+        // 获取地球对象
+        let ellipsoid = this.viewer.scene.globe.ellipsoid;
+        // 获取在地球上点击的坐标点
+        let cartesian = this.viewer.camera.pickEllipsoid(
+          windowPosition,
+          ellipsoid
+        );
+
+        // 如果未点击在地球上，那么返回
+        if (!cartesian) {
+          return;
+        }
+        // 在点击位置添加点实体
+        let point = this.viewer.entities.add({
+          name: "gon_point",
+          position: cartesian,
+          point: {
+            color: this.Cesium.Color.WHITE,
+            pixelSize: 5,
+            outlineColor: this.Cesium.Color.BLACK,
+            outlineWidth: 1
+          }
+        });
+        this.pointArr.push(point.id);
+        this.pointPositions.push(cartesian);
+        // 创建线实体
+        if (this.pointPositions.length >= 2) {
+          if (this.rectDraw === null) {
+            this.rectDraw = this.viewer.entities.add({
+              name: "Polyline",
+              polyline: {
+                positions: this.pointPositions,
+                material: this.Cesium.Color.RED.withAlpha(0.5)
+              }
+            });
+          } else {
+            // 如果面已经存在，那么修改面实体的位置数组即可
+            // this.rectDraw.polyline.positions = new this.Cesium.CallbackProperty(
+            //   () => {
+            //     return this.pointPositions;
+            //   },
+            //   false
+            // );
+            this.rectDraw.polyline.positions = this.pointPositions;
+          }
+        }
+      }, this.Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
   },
   mounted() {

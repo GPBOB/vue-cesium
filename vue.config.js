@@ -38,6 +38,7 @@ module.exports = {
       },
     },
     plugins: [
+      //纯cesium配置
       new CopyWebpackPlugin([
         { from: path.join(cesiumSource, cesiumWorkers), to: "Workers" },
       ]),
@@ -56,6 +57,20 @@ module.exports = {
       new webpack.DefinePlugin({
         CESIUM_BASE_URL: JSON.stringify("./"),
       }),
+      //earthsdk配置
+      new CopyWebpackPlugin([
+        {
+          // from: './node_modules/earthsdk/dist/XbsjCesium',//npm 配置
+          from: './src/earthMap/XbsjCesium',//本地资源配置
+          to: 'js/earthsdk/XbsjCesium',
+          toType: 'dir'
+        },
+        {
+          from: './src/earthMap/XbsjEarth',
+          to: 'js/earthsdk/XbsjEarth',
+          toType: 'dir'
+        },
+      ])
     ],
   }
 };

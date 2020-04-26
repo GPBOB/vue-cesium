@@ -27,6 +27,15 @@ VueRouter.prototype.push = function push(location, onResolve, onReject) {
         component: () => import('views/cesium/cesium.vue')
       },
       {
+        path: '/xbsCesium',
+        name: 'xbsCesium',
+        meta:{
+          route_name:'xbsCesium',
+          icon:''
+        },
+        component: () => import('views/xbsCesium/index')
+      },
+      {
         path: '/three',
         name: 'three',
         meta:{
